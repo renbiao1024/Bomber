@@ -21,5 +21,5 @@ public:
 
 	//BlueprintNativeEvent 需要在定义中ShowInGameState_Implementation 写为这种格式
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "C++")
-	void ShowInGameState(UObject* widget);
+	void ShowInGameState();
 };

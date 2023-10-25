@@ -11,7 +11,7 @@ public class Bomber : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { 
 			"Core", "CoreUObject", "Engine", "InputCore",
 			"HeadMountedDisplay", "UMG", "Slate", "SlateCore",
-			"Http", "Json", "JsonUtilities",
+			"HTTP", "Json", "JsonUtilities",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

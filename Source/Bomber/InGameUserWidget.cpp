@@ -14,6 +14,6 @@ void UInGameUserWidget::SynchronizeProperties()
 	Super::SynchronizeProperties();
 }
 
-void UInGameUserWidget::ShowInGameState_Implementation(UObject* widget)
+void UInGameUserWidget::ShowInGameState_Implementation()
 {
 }

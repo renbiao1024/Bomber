@@ -9,7 +9,7 @@ AMyGameModeBase::AMyGameModeBase()
 {
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 	DefaultPawnClass = 0;
-	HUDClass = 0;
+	HUDClass = nullptr;
 }
 
 void AMyGameModeBase::BeginPlay()
