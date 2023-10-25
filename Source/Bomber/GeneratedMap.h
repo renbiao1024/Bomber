@@ -19,13 +19,12 @@ UENUM(BlueprintType, meta = (Bitflags))
 enum class EActorTypeEnum : uint8 //地图物品类型
 {
 	Default = 0,
-	None = 1 << 0,
-	Bomb = 1 << 1,
-	Item = 1 << 2,
-	Wall = 1 << 3,
+	Wall = 1 << 0,
+	Box = 1 << 1,
+	Bomb = 1 << 2,
+	Item = 1 << 3,
 	Floor = 1 << 4,
-	Box = 1 << 5,
-	Player = 1 << 6,
+	Player = 1 << 5,
 };
 
 USTRUCT(BlueprintType, meta = (HasNativeMake = "Bomber.SingletonLibrary.MakeCell"))
@@ -35,7 +34,7 @@ struct FCell
 
 public:
 	FCell() {};
-	FCell(const FVector& cellLocation);
+	FCell(const AActor* actor);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FVector location;
@@ -71,7 +70,10 @@ public:
 	TSet<FCell> FilterCellsByTypes(const TSet<FCell>& keys, const TArray<EActorTypeEnum>& filterTypes, const ACharacter* excludePlayer) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
-	AActor* AddActorOnMap(const FCell& cell, AActor* updateActor, EActorTypeEnum actorType = EActorTypeEnum::None);
+	AActor* AddActorOnMap(const FCell& cell, EActorTypeEnum actorType);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	void AddActorOnMapByObj(const AActor* updateActor);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
 	bool DestroyActorFromMap(const FCell& cell);
@@ -85,6 +87,9 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
 	bool GenerateLevelMap();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++", meta = (DisplayName = "Generated Map"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
 	TMap<FCell, AActor*> GeneratedMap_;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
+	TArray<ACharacter*> charactersOnMap_;
 };

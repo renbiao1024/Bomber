@@ -5,8 +5,15 @@
 #include "Bomber.h"
 
 
-FCell::FCell(const FVector& cellLocation) : location(cellLocation)
+FCell::FCell(const AActor* actor)
 {
+	CHECKMAP();
+	if (IsValid(actor) == false) return;
+	//Cell的位置设置为Actor的位置
+	this->location = actor->GetActorLocation();
+	//没有地图元素
+	if (USingletonLibrary::GetLevelMap()->GeneratedMap_.Num() == 0) return;
+
 	if (USingletonLibrary::GetLevelMap()->GeneratedMap_.Contains(*this))
 	{
 		return;
@@ -18,7 +25,7 @@ FCell::FCell(const FVector& cellLocation) : location(cellLocation)
 	{
 		if (USingletonLibrary::CalculateCellsLength(i.Key, *this) < USingletonLibrary::CalculateCellsLength(foundedCell, *this))
 		{
-			foundedCell = i.Key;
+			foundedCell.location = i.Key.location;
 		}
 	}
 	this->location = foundedCell.location;
@@ -47,9 +54,13 @@ bool AGeneratedMap::DestroyActorFromMap_Implementation(const FCell& cell)
 	return true;
 }
 
-AActor* AGeneratedMap::AddActorOnMap_Implementation(const FCell& cell, AActor* updateActor, EActorTypeEnum actorType)
+AActor* AGeneratedMap::AddActorOnMap_Implementation(const FCell& cell, EActorTypeEnum actorType)
 {
 	return nullptr;
+}
+
+void AGeneratedMap::AddActorOnMapByObj_Implementation(const AActor* updateActor)
+{
 }
 
 // Called when the game starts or when spawned
@@ -62,8 +73,9 @@ bool AGeneratedMap::GenerateLevelMap_Implementation()
 {
 	if (IsValid(USingletonLibrary::GetSingleton()) == false)
 		return false;
-	if (IsValid(USingletonLibrary::GetSingleton()->levelMap) == false)
-		USingletonLibrary::GetSingleton()->levelMap = this;
+	if (IsValid(USingletonLibrary::GetLevelMap()) == false)
+		USingletonLibrary::GetSingleton()->levelMap_ = this;
 	GeneratedMap_.Empty();
+	charactersOnMap_.Empty();
 	return true;
 }
