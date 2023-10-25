@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "GeneratedMap.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "SingletonLibrary.generated.h"
 
@@ -24,6 +25,33 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	static USingletonLibrary* const GetSingleton();
 
-	UPROPERTY(BlueprintReadWrite)
+	UFUNCTION(BlueprintPure, Category = "C++", meta = (CompactNodeTitle = "toCell"))
+	static FORCEINLINE FCell MakeCell(const FVector& cellLocation)
+	{
+		return FCell(cellLocation);
+	}
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "C++")
+	static FORCEINLINE float GetFloorLength()
+	{
+		return 200.0;
+	}
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "C++")
+	static FORCEINLINE float CalculateCellsLength(const FCell& x, const FCell& y)
+	{
+		//FGenericPlatformMath 通用数学函数库
+		return (fabs((x.location - y.location).Size()) / GetFloorLength());
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
+	static FORCEINLINE class AGeneratedMap* const GetLevelMap()
+	{
+		return GetSingleton()->levelMap;
+	}
+
 	class AGeneratedMap* levelMap;
+
+	UPROPERTY(BlueprintReadWrite, Category = "C++", meta = (BlueprintBaseOnly))
+	TArray<TSubclassOf<AActor>> bpClasses;
 };

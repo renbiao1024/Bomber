@@ -5,13 +5,50 @@
 #include "GameFramework/Actor.h"
 #include "GeneratedMap.generated.h"
 
-UENUM(BlueprintType)
-enum class EPathTypesEnum :uint8
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EPathTypesEnum : uint8  //地图类型
 {
-	Explosion,
-	Free,
-	Safe,
-	Secure,
+	Default = 0,
+	Explosion = 1 << 0,
+	Free = 1 << 1,
+	Safe = 1 << 2,
+	Secure = 1 << 3,
+};
+
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EActorTypeEnum : uint8 //地图物品类型
+{
+	Default = 0,
+	None = 1 << 0,
+	Bomb = 1 << 1,
+	Item = 1 << 2,
+	Wall = 1 << 3,
+	Floor = 1 << 4,
+	Box = 1 << 5,
+	Player = 1 << 6,
+};
+
+USTRUCT(BlueprintType, meta = (HasNativeMake = "Bomber.SingletonLibrary.MakeCell"))
+struct FCell
+{
+	GENERATED_BODY()
+
+public:
+	FCell() {};
+	FCell(const FVector& cellLocation);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector location;
+
+	bool operator== (const FCell& other) const
+	{
+		return this->location == other.location;
+	}
+
+	friend FORCEINLINE uint32 GetTypeHash(const FCell& other)
+	{
+		return GetTypeHash(other.location);
+	}
 };
 
 UCLASS()
@@ -23,10 +60,31 @@ public:
 	// Sets default values for this actor's properties
 	AGeneratedMap();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "C++")
-	void GetSideLocations(FVector vector, int32 sideLength, EPathTypesEnum pathfinder, TSet<FVector>& result);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPushNongeneratedToMap);
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FPushNongeneratedToMap onActorsUpdateDelegate;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "C++")
+	TSet<FCell> GetSidesCells(const FCell& cell, int32 sideLength, EPathTypesEnum pathfinder) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "C++", meta = (AdvancedDisplay = 2))
+	TSet<FCell> FilterCellsByTypes(const TSet<FCell>& keys, const TArray<EActorTypeEnum>& filterTypes, const ACharacter* excludePlayer) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	AActor* AddActorOnMap(const FCell& cell, AActor* updateActor, EActorTypeEnum actorType = EActorTypeEnum::None);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	bool DestroyActorFromMap(const FCell& cell);
 
 protected:
+	friend FCell;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	bool GenerateLevelMap();
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++", meta = (DisplayName = "Generated Map"))
+	TMap<FCell, AActor*> GeneratedMap_;
 };

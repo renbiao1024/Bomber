@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
-#define PRINT(String) GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, string, true. FVector2D(2,2));
+#define PRINT(string) GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, string, true. FVector2D(2,2));
 #include "MyGameModeBase.h"
 #include "MyPlayerController.h"
 #include "GeneratedMap.h"
