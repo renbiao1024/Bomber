@@ -22,6 +22,6 @@ public:
 
 	DECLARE_DELEGATE_OneParam(FEscapeDelegate, UObject*);
 
-	UPROPERTY(BlueprintReadWrite, Category = "C++")
+	UPROPERTY(BlueprintReadOnly, Category = "C++")
 	class AMyHUD* MyCustomHUD;
 };

@@ -16,30 +16,32 @@ UMapComponent::UMapComponent()
 
 void UMapComponent::UpdateSelfOnMap()
 {
-	if (!ISVALID(owner) || !ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT) return;
-	if (owner->IsA(ACharacter::StaticClass()))
-	{
-		cell = FCell(owner);
-	}
-	USingletonLibrary::GetLevelMap()->AddActorOnMapByObj(cell, owner);
+	if (!ISVALID(GetOwner()) || !ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT(GetOwner())) 
+		return;
+
+	USingletonLibrary::GetLevelMap()->AddActorOnMapByObj(FCell(GetOwner()), GetOwner());
 }
 
 void UMapComponent::OnComponentCreated()
 {
 	Super::OnComponentCreated();
-	owner = GetOwner();
-	if (!ISVALID(owner) || !ISVALID(USingletonLibrary::GetLevelMap())|| ISTRANSIENT) return;
-	cell = FCell(owner);
-	owner->bRunConstructionScriptOnDrag = false;
+	if (!ISVALID(GetOwner()) || !ISVALID(USingletonLibrary::GetLevelMap())|| ISTRANSIENT(GetOwner())) 
+		return;
+	GetOwner()->bRunConstructionScriptOnDrag = false;
 	//×¢²áÊ±°ó¶¨Î¯ÍÐ
 	USingletonLibrary::GetLevelMap()->onActorsUpdatedDelegate.AddDynamic(this, &UMapComponent::UpdateSelfOnMap);
 }
 
 void UMapComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	if (owner != nullptr && ISVALID(USingletonLibrary::GetLevelMap()) && !ISTRANSIENT)
+	if (ISVALID(USingletonLibrary::GetLevelMap()) && !ISTRANSIENT(GetOwner()))
 	{
-		UE_LOG_STR("OnComponentDestroyed %s", *owner->GetName());
+		const ACharacter* character = Cast<ACharacter>(GetOwner());
+		if (character != nullptr && USingletonLibrary::GetLevelMap()->charactersOnMap_.Contains(character))
+		{
+			USingletonLibrary::GetLevelMap()->charactersOnMap_.Remove(character);
+		}
+		UE_LOG_STR("OnComponentDestroyed %s", *GetOwner()->GetName());
 	}
 
 	Super::OnComponentDestroyed(bDestroyingHierarchy);

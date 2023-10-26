@@ -17,7 +17,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(BlueprintReadWrite, Category = "C++")
+	UPROPERTY(BlueprintReadOnly, Category = "C++")
 	class UMapComponent* mapComponent;
 
 protected:
@@ -25,6 +25,4 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
-
-	virtual void Destroyed() override;
 };

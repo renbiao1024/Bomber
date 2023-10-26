@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "GeneratedMap.h"
 #include "Components/ActorComponent.h"
 #include "MapComponent.generated.h"
 
@@ -18,12 +17,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void UpdateSelfOnMap();
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	struct FCell cell;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	AActor* owner;
 
 protected:
 	virtual void OnComponentCreated() final;

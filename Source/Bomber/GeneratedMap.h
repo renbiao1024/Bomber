@@ -36,7 +36,7 @@ public:
 	FCell() {};
 	FCell(const AActor* actor);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FVector location;
 
 	bool operator== (const FCell& other) const
@@ -76,10 +76,11 @@ public:
 	void AddActorOnMapByObj(const FCell& cell, const AActor* updateActor);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
-	void DestroyActorFromMap(const FCell& cell);
+	void DestroyActorsFromMap(const FCell& cell);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	TSet<ACharacter*> charactersOnMap_;
+	TSet<const ACharacter*> charactersOnMap_;
+
 protected:
 	friend FCell;
 
@@ -94,7 +95,7 @@ protected:
 	void GenerateLevelMap();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++", meta = (DisplayName = "Grid Array"))
-	TMap<FCell, AActor*> GeneratedMap_;
+	TMap<FCell, const AActor*> GeneratedMap_;
 
 	//只能在蓝图中实现，而不能在C++中实现
 	UFUNCTION(BlueprintImplementableEvent, Category = "C++", meta = (DevelopmentOnly))

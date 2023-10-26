@@ -26,19 +26,19 @@ public:
 	static USingletonLibrary* const GetSingleton();
 
 	UFUNCTION(BlueprintPure, Category = "C++", meta = (CompactNodeTitle = "toCell"))
-	static FORCEINLINE FCell MakeCell(const AActor* actor)
+	static const FORCEINLINE FCell MakeCell(const AActor* actor)
 	{
 		return FCell(actor);
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "C++", meta = (DisplayName = "Get Grid Size"))
-	static FORCEINLINE float GetFloorLength()
+	static const FORCEINLINE float GetFloorLength()
 	{
 		return 200.0;
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "C++")
-	static FORCEINLINE float CalculateCellsLength(const FCell& x, const FCell& y)
+	static const FORCEINLINE float CalculateCellsLength(const FCell& x, const FCell& y)
 	{
 		//FGenericPlatformMath 通用数学函数库
 		return (fabs((x.location - y.location).Size()) / GetFloorLength());
@@ -50,10 +50,18 @@ public:
 		return (IsValid(GetSingleton()) ? GetSingleton()->levelMap_ : nullptr);
 	}
 
-	UPROPERTY(BlueprintReadWrite, Category = "C++", meta = (BlueprintBaseOnly))
-	TArray<TSubclassOf<AActor>> bpClasses;
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static FORCEINLINE bool SetLevelMap(class AGeneratedMap* levelMap)
+	{
+		if (GetLevelMap() == levelMap || IsValid(levelMap) == false || IsValid(USingletonLibrary::GetSingleton()) == false)
+			return false;
+		GetSingleton()->levelMap_ = levelMap;
+		return true;
+	}
+
+	UPROPERTY(BlueprintReadOnly, Category = "C++", meta = (BlueprintBaseOnly))
+	TArray<const TSubclassOf<AActor>> bpClasses;
 
 protected:
-	friend class AGeneratedMap;
 	class AGeneratedMap* levelMap_;
 };

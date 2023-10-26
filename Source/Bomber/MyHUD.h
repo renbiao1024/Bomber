@@ -18,6 +18,6 @@ public:
 
 	void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadWrite, Category = "C++")
+	UPROPERTY(BlueprintReadOnly, Category = "C++")
 	class UUserWidget* umgCurrentObj;
 };

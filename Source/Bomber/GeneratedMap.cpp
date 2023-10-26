@@ -7,7 +7,8 @@
 
 FCell::FCell(const AActor* actor)
 {
-	if (!ISVALID(actor) || ISVALID(USingletonLibrary::GetLevelMap())) return;
+	if (!ISVALID(actor) || ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT(actor))
+		return;
 
 	//没有地图元素
 	if (USingletonLibrary::GetLevelMap()->GeneratedMap_.Num() == 0) return;
@@ -34,16 +35,36 @@ TSet<FCell> AGeneratedMap::FilterCellsByTypes_Implementation(const TSet<FCell>& 
 	return foundedLocations;
 }
 
-void AGeneratedMap::DestroyActorFromMap_Implementation(const FCell& cell)
-{
-}
-
 AActor* AGeneratedMap::AddActorOnMap_Implementation(const FCell& cell, EActorTypeEnum actorType)
 {
 	return nullptr;
 }
 
+
 void AGeneratedMap::AddActorOnMapByObj_Implementation(const FCell& cell, const AActor* updateActor)
+{
+	if (ISVALID(updateActor) == false || !GeneratedMap_.Contains(cell) || ISTRANSIENT(updateActor))
+		return;
+
+
+	const ACharacter* updateCharacter = Cast<ACharacter>(updateActor);
+	if (updateCharacter != nullptr)	//角色
+	{
+		charactersOnMap_.Add(updateCharacter);
+	}
+	else //其他actor
+	{
+		//通过 value 找 key
+		const FCell* cellOfExistingActor = GeneratedMap_.FindKey(updateActor);
+		if (cellOfExistingActor != nullptr && cellOfExistingActor->location != cell.location)
+		{
+			GeneratedMap_.Remove(*cellOfExistingActor);
+		}
+		GeneratedMap_.Add(cell, updateActor);
+	}
+}
+
+void AGeneratedMap::DestroyActorsFromMap_Implementation(const FCell& cell)
 {
 }
 
@@ -51,10 +72,15 @@ void AGeneratedMap::AddActorOnMapByObj_Implementation(const FCell& cell, const A
 void AGeneratedMap::BeginPlay()
 {
 	Super::BeginPlay();
+	USingletonLibrary::SetLevelMap(this);
+	USingletonLibrary::GetLevelMap()->charactersOnMap_.Compact();
+	USingletonLibrary::GetLevelMap()->charactersOnMap_.Shrink();
 }
 
 void AGeneratedMap::OnConstruction(const FTransform& Transform)
 {
+	if (ISTRANSIENT(this) == true)
+		return;
 	GenerateLevelMap();
 }
 
@@ -71,10 +97,7 @@ void AGeneratedMap::Destroyed()
 
 void AGeneratedMap::GenerateLevelMap_Implementation()
 {
-	if (!ISVALID(USingletonLibrary::GetSingleton()))
-		return;
-	if (!ISVALID(USingletonLibrary::GetLevelMap()))
-		USingletonLibrary::GetSingleton()->levelMap_ = this;
+	USingletonLibrary::SetLevelMap(this);
 	GeneratedMap_.Empty();
 	charactersOnMap_.Empty();
 }
