@@ -9,6 +9,7 @@ AMyCharacter::AMyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 
 	//初始化地图部件
 	mapComponent = CreateDefaultSubobject<UMapComponent>("Map Component");
@@ -18,7 +19,8 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ACharacter* character = Cast<ACharacter>(mapComponent->owner);
+
 }
 
 void AMyCharacter::OnConstruction(const FTransform& Transform)
@@ -27,7 +29,11 @@ void AMyCharacter::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	if (!ISVALID(USingletonLibrary::GetLevelMap())) return;
 	mapComponent->UpdateSelfOnMap();
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+}
+
+void AMyCharacter::Destroyed()
+{
+	Super::Destroyed();
 }
 
 // Called to bind functionality to input

@@ -12,37 +12,7 @@ FCell::FCell(const AActor* actor)
 	//没有地图元素
 	if (USingletonLibrary::GetLevelMap()->GeneratedMap_.Num() == 0) return;
 
-	for (int32 i = 0; i < 3; ++i)
-	{
-		switch (i)
-		{
-		case 0:
-			//原始位置
-			location = actor->GetActorLocation();
-			break;
-		case 1:
-			//GridSnap函数返回一个新的FVector对象，这个对象是原向量对齐到网格后的结果。
-			location = actor->GetActorLocation().GridSnap(USingletonLibrary::GetFloorLength());
-			break;
-		case 2:
-			FCell foundedCell;
-			//当前Cell的位置是已知的地图中距离自己最近的地图cell的location
-			for (const auto& j : USingletonLibrary::GetLevelMap()->GeneratedMap_)
-			{
-				if (USingletonLibrary::CalculateCellsLength(j.Key, *this) < USingletonLibrary::CalculateCellsLength(foundedCell, *this))
-				{
-					foundedCell.location = j.Key.location;
-				}
-			}
-			location = foundedCell.location;
-			break;
-		}
-	}
-
-	if (USingletonLibrary::GetLevelMap()->GeneratedMap_.Contains(*this) && !IsValid(*USingletonLibrary::GetLevelMap()->GeneratedMap_.Find(*this)))
-	{
-		return;
-	}
+	location = USingletonLibrary::GetLevelMap()->GetNearestCell(actor).location;
 }
 
 // Sets default values
@@ -73,7 +43,7 @@ AActor* AGeneratedMap::AddActorOnMap_Implementation(const FCell& cell, EActorTyp
 	return nullptr;
 }
 
-void AGeneratedMap::AddActorOnMapByObj_Implementation(const AActor* updateActor)
+void AGeneratedMap::AddActorOnMapByObj_Implementation(const FCell& cell, const AActor* updateActor)
 {
 }
 
@@ -85,15 +55,26 @@ void AGeneratedMap::BeginPlay()
 
 void AGeneratedMap::OnConstruction(const FTransform& Transform)
 {
-	if (!ISVALID(USingletonLibrary::GetSingleton()))
-		return;
-	if (!ISVALID(USingletonLibrary::GetLevelMap()))
-		USingletonLibrary::GetSingleton()->levelMap_ = this;
 	GenerateLevelMap();
+}
+
+void AGeneratedMap::Destroyed()
+{
+	TArray<AActor*> attachedActors;
+	GetAttachedActors(attachedActors);
+	for (auto* attachedActor : attachedActors)
+	{
+		attachedActor->Destroy();
+	}
+	Super::Destroyed();
 }
 
 void AGeneratedMap::GenerateLevelMap_Implementation()
 {
+	if (!ISVALID(USingletonLibrary::GetSingleton()))
+		return;
+	if (!ISVALID(USingletonLibrary::GetLevelMap()))
+		USingletonLibrary::GetSingleton()->levelMap_ = this;
 	GeneratedMap_.Empty();
 	charactersOnMap_.Empty();
 }

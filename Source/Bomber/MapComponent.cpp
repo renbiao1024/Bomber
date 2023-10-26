@@ -16,25 +16,31 @@ UMapComponent::UMapComponent()
 
 void UMapComponent::UpdateSelfOnMap()
 {
-	if (!ISVALID(GetOwner()) || !ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT) return;
-	cellLocation = FCell(GetOwner());
-	//根据该组件的拥有者信息添加MapComponent
-	USingletonLibrary::GetLevelMap()->AddActorOnMapByObj(GetOwner());
+	if (!ISVALID(owner) || !ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT) return;
+	if (owner->IsA(ACharacter::StaticClass()))
+	{
+		cell = FCell(owner);
+	}
+	USingletonLibrary::GetLevelMap()->AddActorOnMapByObj(cell, owner);
 }
 
 void UMapComponent::OnComponentCreated()
 {
 	Super::OnComponentCreated();
-	if (!ISVALID(GetOwner()) || !ISVALID(USingletonLibrary::GetLevelMap())|| ISTRANSIENT) return;
-	GetOwner()->bRunConstructionScriptOnDrag = false;
+	owner = GetOwner();
+	if (!ISVALID(owner) || !ISVALID(USingletonLibrary::GetLevelMap())|| ISTRANSIENT) return;
+	cell = FCell(owner);
+	owner->bRunConstructionScriptOnDrag = false;
 	//注册时绑定委托
-	USingletonLibrary::GetLevelMap()->onActorsUpdateDelegate.AddDynamic(this, &UMapComponent::UpdateSelfOnMap);
+	USingletonLibrary::GetLevelMap()->onActorsUpdatedDelegate.AddDynamic(this, &UMapComponent::UpdateSelfOnMap);
 }
 
 void UMapComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
-	if (!ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT) return;
+	if (owner != nullptr && ISVALID(USingletonLibrary::GetLevelMap()) && !ISTRANSIENT)
+	{
+		UE_LOG_STR("OnComponentDestroyed %s", *owner->GetName());
+	}
 
-	USingletonLibrary::GetLevelMap()->DestroyActorFromMap(cellLocation);
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }

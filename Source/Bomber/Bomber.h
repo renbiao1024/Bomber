@@ -15,6 +15,6 @@
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
 
-#define PRINT(string) GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, string, true. FVector2D(2,2));
-#define ISVALID(obj) ((obj != nullptr) && IsValid(obj) && !obj->IsPendingKill())
+#define UE_LOG_STR(message, string) UE_LOG(LogTemp, Warning, TEXT(message), string)
+#define ISVALID(obj) ((obj != nullptr) && IsValid(obj) && (obj->IsPendingKill() == false))
 #define ISTRANSIENT (HasAllFlags(RF_Transient) || UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Transient")

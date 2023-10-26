@@ -61,7 +61,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPushNongeneratedToMap);
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "C++")
-	FPushNongeneratedToMap onActorsUpdateDelegate;
+	FPushNongeneratedToMap onActorsUpdatedDelegate;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "C++")
 	TSet<FCell> GetSidesCells(const FCell& cell, int32 sideLength, EPathTypesEnum pathfinder) const;
@@ -73,11 +73,13 @@ public:
 	AActor* AddActorOnMap(const FCell& cell, EActorTypeEnum actorType);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
-	void AddActorOnMapByObj(const AActor* updateActor);
+	void AddActorOnMapByObj(const FCell& cell, const AActor* updateActor);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
 	void DestroyActorFromMap(const FCell& cell);
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
+	TSet<ACharacter*> charactersOnMap_;
 protected:
 	friend FCell;
 
@@ -86,12 +88,15 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	virtual void Destroyed() override;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
 	void GenerateLevelMap();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++", meta = (DisplayName = "Grid Array"))
 	TMap<FCell, AActor*> GeneratedMap_;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	TSet<ACharacter*> charactersOnMap_;
+	//只能在蓝图中实现，而不能在C++中实现
+	UFUNCTION(BlueprintImplementableEvent, Category = "C++", meta = (DevelopmentOnly))
+	FCell GetNearestCell(const AActor* actor);
 };

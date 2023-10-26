@@ -20,10 +20,12 @@ public:
 	void UpdateSelfOnMap();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	struct FCell cellLocation;
+	struct FCell cell;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
+	AActor* owner;
 
 protected:
 	virtual void OnComponentCreated() final;
-
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) final;
 };

@@ -17,6 +17,6 @@ class BOMBER_API UMyGameInstance : public UGameInstance
 public:
 	void Init() override {
 		Super::Init();
-		UGameplayStatics::OpenLevel(this, "/Game/Bomber/Map/MenuLevel", false);
+		//UGameplayStatics::OpenLevel(this, "/Game/Bomber/Map/MenuLevel", false);
 	}
 };
