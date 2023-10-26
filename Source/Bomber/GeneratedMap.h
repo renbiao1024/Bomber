@@ -60,7 +60,7 @@ public:
 	AGeneratedMap();
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPushNongeneratedToMap);
-	UPROPERTY(BlueprintAssignable, Category = "C++")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "C++")
 	FPushNongeneratedToMap onActorsUpdateDelegate;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "C++")
@@ -76,7 +76,7 @@ public:
 	void AddActorOnMapByObj(const AActor* updateActor);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
-	bool DestroyActorFromMap(const FCell& cell);
+	void DestroyActorFromMap(const FCell& cell);
 
 protected:
 	friend FCell;
@@ -84,12 +84,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
-	bool GenerateLevelMap();
+	virtual void OnConstruction(const FTransform& Transform) override;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
+	void GenerateLevelMap();
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++", meta = (DisplayName = "Grid Array"))
 	TMap<FCell, AActor*> GeneratedMap_;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	TArray<ACharacter*> charactersOnMap_;
+	TSet<ACharacter*> charactersOnMap_;
 };

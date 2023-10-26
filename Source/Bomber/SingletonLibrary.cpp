@@ -2,6 +2,7 @@
 
 
 #include "SingletonLibrary.h"
+#include "Bomber.h"
 
 USingletonLibrary::USingletonLibrary()
 {
@@ -25,9 +26,9 @@ USingletonLibrary::USingletonLibrary()
 
 USingletonLibrary* const USingletonLibrary::GetSingleton()
 {
-	if (IsValid(GEngine) == false) return nullptr;
+	if (!ISVALID(GEngine)) return nullptr;
 	USingletonLibrary* singleton = Cast<USingletonLibrary>(GEngine->GameSingleton);
-	if (IsValid(singleton) == false) return nullptr;
+	if (!ISVALID(singleton)) return nullptr;
 	return singleton;
 }
 

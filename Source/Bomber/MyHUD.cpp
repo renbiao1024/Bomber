@@ -28,6 +28,6 @@ AMyHUD::AMyHUD()
 
 void AMyHUD::BeginPlay()
 {
-	if (IsValid(umgCurrentObj))
+	if (ISVALID(umgCurrentObj))
 		umgCurrentObj->AddToViewport();
 }

@@ -21,6 +21,15 @@ void AMyCharacter::BeginPlay()
 	
 }
 
+void AMyCharacter::OnConstruction(const FTransform& Transform)
+{
+	//角色构造的时候会把自己在地图上更新位置
+	Super::OnConstruction(Transform);
+	if (!ISVALID(USingletonLibrary::GetLevelMap())) return;
+	mapComponent->UpdateSelfOnMap();
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+}
+
 // Called to bind functionality to input
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

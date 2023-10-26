@@ -16,26 +16,25 @@ UMapComponent::UMapComponent()
 
 void UMapComponent::UpdateSelfOnMap()
 {
-	CHECKMAP();
+	if (!ISVALID(GetOwner()) || !ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT) return;
 	cellLocation = FCell(GetOwner());
 	//根据该组件的拥有者信息添加MapComponent
 	USingletonLibrary::GetLevelMap()->AddActorOnMapByObj(GetOwner());
 }
 
-void UMapComponent::OnRegister()
+void UMapComponent::OnComponentCreated()
 {
-	Super::OnRegister();
-	CHECKMAP();
-	if (IsValid(GetOwner()) == false) return;
+	Super::OnComponentCreated();
+	if (!ISVALID(GetOwner()) || !ISVALID(USingletonLibrary::GetLevelMap())|| ISTRANSIENT) return;
+	GetOwner()->bRunConstructionScriptOnDrag = false;
 	//注册时绑定委托
 	USingletonLibrary::GetLevelMap()->onActorsUpdateDelegate.AddDynamic(this, &UMapComponent::UpdateSelfOnMap);
-	UpdateSelfOnMap();
 }
 
-void UMapComponent::BeginDestroy()
+void UMapComponent::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	Super::BeginDestroy();
-	CHECKMAP();
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	if (!ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT) return;
+
 	USingletonLibrary::GetLevelMap()->DestroyActorFromMap(cellLocation);
 }
-

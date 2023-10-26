@@ -31,7 +31,7 @@ public:
 		return FCell(actor);
 	}
 
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "C++")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "C++", meta = (DisplayName = "Get Grid Size"))
 	static FORCEINLINE float GetFloorLength()
 	{
 		return 200.0;
@@ -47,7 +47,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "C++")
 	static FORCEINLINE class AGeneratedMap* const GetLevelMap()
 	{
-		return (IsValid(GetSingleton()->levelMap_) ? GetSingleton()->levelMap_ : nullptr);
+		return (IsValid(GetSingleton()) ? GetSingleton()->levelMap_ : nullptr);
 	}
 
 	UPROPERTY(BlueprintReadWrite, Category = "C++", meta = (BlueprintBaseOnly))

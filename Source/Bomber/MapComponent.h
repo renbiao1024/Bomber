@@ -23,7 +23,7 @@ public:
 	struct FCell cellLocation;
 
 protected:
-	void OnRegister() final;
+	virtual void OnComponentCreated() final;
 
-	void BeginDestroy() final;
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) final;
 };
