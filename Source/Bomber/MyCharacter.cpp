@@ -2,7 +2,11 @@
 
 
 #include "MyCharacter.h"
+#include "Bomb.h"
 #include "Bomber.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "GeneratedMap.h"
+
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -11,7 +15,7 @@ AMyCharacter::AMyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//初始化地图部件
-	mapComponent = CreateDefaultSubobject<UMapComponent>("Map Component");
+	mapComponent_ = CreateDefaultSubobject<UMapComponent>(TEXT("Map Component"));
 
 	//设置 steletal
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> skeletalMeshFinder(TEXT("TODO PATH OF skeletalMesh"));
@@ -32,15 +36,29 @@ void AMyCharacter::OnConstruction(const FTransform& Transform)
 {
 	//角色构造的时候会把自己在地图上更新位置
 	Super::OnConstruction(Transform);
-	if (!ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT(this) == true) 
+	if (ISVALID(mapComponent_) == false || ISTRANSIENT(this) == true)
 		return;
 
-	mapComponent->UpdateSelfOnMap();
+	mapComponent_->UpdateSelfOnMap();
 
 	if (ISVALID(GetRootComponent()) == true)
 	{
 		const float ACTOR_HEIGHT = GetRootComponent()->Bounds.BoxExtent.Z;//包围盒的z半径,也就是总高度的一半
-		GetRootComponent()->AddRelativeLocation(FVector(0, 0, ACTOR_HEIGHT));
+		//GetRootComponent()->AddRelativeLocation(FVector(0, 0, ACTOR_HEIGHT));
+	}
+}
+
+void AMyCharacter::SpawnBomb()
+{
+	if (powerups_.fireN == 0 || HasActorBegunPlay() == false)
+		return;
+
+	ABomb* const bomb = Cast<ABomb>(USingletonLibrary::GetLevelMap()->AddActorOnMap(FCell(this), EActorTypeEnum::Bomb));
+	if (bomb != nullptr)
+	{
+		//放置炸弹 自身可用的炸弹数量减少
+		bomb->InitializeBombProperties(&powerups_.bombN, powerups_.fireN, characterID_);
+		powerups_.bombN--;
 	}
 }
 
@@ -48,6 +66,6 @@ void AMyCharacter::OnConstruction(const FTransform& Transform)
 void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	PlayerInputComponent->BindAction("SpawnEvent", EInputEvent::IE_Pressed, this, &AMyCharacter::SpawnBomb);
 }
 

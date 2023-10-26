@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "GameFramework/Character.h"
-#include "GeneratedMap.h"
 #include "Kismet/GameplayStatics.h"
 #include "MapComponent.h"
 #include "MyGameModeBase.h"

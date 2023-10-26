@@ -3,18 +3,8 @@
 
 #include "GeneratedMap.h"
 #include "Bomber.h"
-
-
-FCell::FCell(const AActor* actor)
-{
-	if (!ISVALID(actor) || ISVALID(USingletonLibrary::GetLevelMap()) || ISTRANSIENT(actor))
-		return;
-
-	//没有地图元素
-	if (USingletonLibrary::GetLevelMap()->GeneratedMap_.Num() == 0) return;
-
-	location = USingletonLibrary::GetLevelMap()->GetNearestCell(actor).location;
-}
+#include "Cell.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AGeneratedMap::AGeneratedMap()
@@ -29,17 +19,16 @@ TSet<FCell> AGeneratedMap::GetSidesCells_Implementation(const FCell& cell, int32
 	return foundedLocations;
 }
 
-TSet<FCell> AGeneratedMap::FilterCellsByTypes_Implementation(const TSet<FCell>& keys, const TArray<EActorTypeEnum>& filterTypes, const ACharacter* excludePlayer) const
-{
-	TSet<FCell> foundedLocations;
-	return foundedLocations;
-}
-
 AActor* AGeneratedMap::AddActorOnMap_Implementation(const FCell& cell, EActorTypeEnum actorType)
 {
 	return nullptr;
 }
 
+TSet<FCell> AGeneratedMap::FilterCellsByTypes_Implementation(const TSet<FCell>& keys, TArray<EActorTypeEnum>& filterTypes, const ACharacter* excludePlayer) const
+{
+	TSet<FCell> foundedLocations;
+	return foundedLocations;
+}
 
 void AGeneratedMap::AddActorOnMapByObj_Implementation(const FCell& cell, const AActor* updateActor)
 {

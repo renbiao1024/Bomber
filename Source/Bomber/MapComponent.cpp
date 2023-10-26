@@ -3,6 +3,8 @@
 
 #include "MapComponent.h"
 #include "Bomber.h"
+#include "GeneratedMap.h"
+#include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
 UMapComponent::UMapComponent()

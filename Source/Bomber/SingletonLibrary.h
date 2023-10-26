@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GeneratedMap.h"
+#include "Cell.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "SingletonLibrary.generated.h"
 
@@ -53,14 +53,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static FORCEINLINE bool SetLevelMap(class AGeneratedMap* levelMap)
 	{
-		if (GetLevelMap() == levelMap || IsValid(levelMap) == false || IsValid(USingletonLibrary::GetSingleton()) == false)
+		if (GetLevelMap() == levelMap || levelMap == nullptr || IsValid(USingletonLibrary::GetSingleton()) == false)
 			return false;
 		GetSingleton()->levelMap_ = levelMap;
 		return true;
 	}
-
-	UPROPERTY(BlueprintReadOnly, Category = "C++", meta = (BlueprintBaseOnly))
-	TArray<const TSubclassOf<AActor>> bpClasses;
 
 protected:
 	class AGeneratedMap* levelMap_;

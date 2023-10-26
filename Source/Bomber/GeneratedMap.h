@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Cell.h"
 #include "GameFramework/Actor.h"
 #include "GeneratedMap.generated.h"
 
@@ -27,29 +28,6 @@ enum class EActorTypeEnum : uint8 //地图物品类型
 	Player = 1 << 5,
 };
 
-USTRUCT(BlueprintType, meta = (HasNativeMake = "Bomber.SingletonLibrary.MakeCell"))
-struct FCell
-{
-	GENERATED_BODY()
-
-public:
-	FCell() {};
-	FCell(const AActor* actor);
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	FVector location;
-
-	bool operator== (const FCell& other) const
-	{
-		return this->location == other.location;
-	}
-
-	friend FORCEINLINE uint32 GetTypeHash(const FCell& other)
-	{
-		return GetTypeHash(other.location);
-	}
-};
-
 UCLASS()
 class BOMBER_API AGeneratedMap : public AActor
 {
@@ -67,7 +45,7 @@ public:
 	TSet<FCell> GetSidesCells(const FCell& cell, int32 sideLength, EPathTypesEnum pathfinder) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "C++", meta = (AdvancedDisplay = 2))
-	TSet<FCell> FilterCellsByTypes(const TSet<FCell>& keys, const TArray<EActorTypeEnum>& filterTypes, const ACharacter* excludePlayer) const;
+	TSet<FCell> FilterCellsByTypes(const TSet<FCell>& keys, TArray<EActorTypeEnum>& filterTypes, const class ACharacter* excludePlayer) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "C++")
 	AActor* AddActorOnMap(const FCell& cell, EActorTypeEnum actorType);
@@ -79,10 +57,10 @@ public:
 	void DestroyActorsFromMap(const FCell& cell);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "C++")
-	TSet<const ACharacter*> charactersOnMap_;
+	TSet<const class ACharacter*> charactersOnMap_;
 
 protected:
-	friend FCell;
+	friend struct FCell;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
